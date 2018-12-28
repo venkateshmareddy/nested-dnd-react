@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd";
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import ServiceCommandUnit from "./ServiceCommandUnit";
 
