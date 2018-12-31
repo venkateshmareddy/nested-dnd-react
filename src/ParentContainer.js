@@ -10,44 +10,38 @@ const reorder = (list, startIndex, endIndex) => {
     result.splice(endIndex, 0, removed);
     return result;
 };
-
-const grid = 8;
-
-const getItemStyle = (isDragging, draggableStyle) => ({
-    // some basic styles to make the items look a bit nicer
-    userSelect: "none",
-    padding: grid,
-    margin: `0 0 ${grid}px 0`,
-    // change background colour if dragging
-    background: isDragging
-        ? "lightgreen"
-        : "grey",
-
-    // styles we need to apply on draggables
-    ...draggableStyle
-});
-
-const getListStyle = isDraggingOver => ({
-    background: isDraggingOver
-        ? "lightblue"
-        : "lightgrey",
-    padding: grid,
-    // width: 700
-});
-
-
-
+const grid =8;
 export default class ParentContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            items:this.props.data
+            items:this.props.data,
+            parentStyle:this.props.styleObj.parentstyling,
         };
         this.onDragEnd = this
             .onDragEnd
             .bind(this);
     }
-
+    getItemStyle = (isDragging, draggableStyle) => ({
+        // some basic styles to make the items look a bit nicer
+        userSelect: "none",
+        padding: this.state.parentStyle.padding || grid,
+        margin: this.state.parentStyle.margin || `0 0 ${grid}px 0`,
+        // change background colour if dragging
+        background: isDragging
+            ? this.state.parentStyle.ondraggingBackground || "lightgreen"
+            : this.state.parentStyle.background || "grey",
+    
+        // styles we need to apply on draggables
+        ...draggableStyle
+    });
+    getListStyle = isDraggingOver => ({
+        background: isDraggingOver
+            ? this.state.parentStyle.listStyling.onDragging || "lightblue"
+            : this.state.parentStyle.listStyling.background || "lightgrey",
+        padding: this.state.parentStyle.padding || grid,
+        width: this.state.parentStyle.listStyling.width || "100%"
+    });
     onDragEnd(result) {
         // dropped outside the list
         if (!result.destination) {
@@ -87,7 +81,7 @@ export default class ParentContainer extends Component {
             <DragDropContext onDragEnd={this.onDragEnd}>
                 <Droppable droppableId="droppable" type="parent">
                     {(provided, snapshot) => (
-                        <div ref={provided.innerRef} style={getListStyle(snapshot.isDraggingOver)}>
+                        <div ref={provided.innerRef} style={this.getListStyle(snapshot.isDraggingOver)}>
                             {this
                                 .state
                                 .items
@@ -98,9 +92,9 @@ export default class ParentContainer extends Component {
                                                 <div
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
-                                                    style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}>
+                                                    style={this.getItemStyle(snapshot.isDragging, provided.draggableProps.style)}>
                                                     {item.label}
-                                                    {item.children && <ServiceCommandUnit type={item.id} children={item.children}/>}
+                                                    {item.children && <ServiceCommandUnit type={item.id} children={item.children} styleObj={this.props.styleObj.childstyling}/>}
                                                 </div>
                                                 {provided.placeholder}
                                             </div>
